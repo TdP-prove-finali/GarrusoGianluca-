@@ -218,9 +218,110 @@ class Model:
             top_five_tracks.append(idMapAllTracks[order_tracks[i]])
 
         return top_five_tracks
+    #return lista di oggetti con dataclass
 
     def get_top_five_artists(self):
         return DAO.get_topArtists()
+    #return lista di oggetti con dataclass
+
+
+    def get_top_five_genres(self):
+        return DAO.get_TopGenres()
+    #return di oggetti con dataclass
+
+    def get_num_tracks(self):
+        return DAO.get_num_tracks()
+    #return int
+
+    def get_num_customers(self):
+        return DAO.get_num_customers()
+    #return int
+
+    def get_num_fatture(self):
+        return DAO.get_num_fatture()
+    #return int
+
+
+    def get_top_3_artist_with_more_different_clients(self):
+        return DAO.get_artists_with_more_different_clients()
+    #return una lista con 3 oggetti--> dataclass
+
+    def get_top_3_spenders(self):
+        return DAO.get_top3_spender()
+    #return di una lista di tuple con ('name','surname')
+
+
+    def get_name_genres(self):
+        return DAO.get_name_genres()
+    #return lista di stringhe con i nomi die generi
+
+
+    def get_all_dates(self):
+        return DAO.get_all_dates()
+    #return elenco di date ordinate del tipo <class 'datetime.datetime'>
+
+    def get_top_bridge_tracks(self):
+        centrality = nx.betweenness_centrality(self._graph1, weight="weight")
+
+        results = []
+
+        for node in self._graph1.nodes:
+            degree = self._graph1.degree(node)
+            weighted_degree = self._graph1.degree(node, weight="weight")
+
+            results.append({
+                "track": node,
+                "degree": degree,
+                "weighted_degree": weighted_degree,
+                "centrality": centrality[node]
+            })
+
+        results.sort(key=lambda x: x["centrality"], reverse=True)
+
+        return results[:3]
+    #funzione sul grafo 1 che dà completezza e mostra quelli che sono i brani piu centrali
+
+    def get_top_artists(self):
+        results = []
+        centrality = nx.betweenness_centrality(self._graph2,weight="weight")
+
+        for artist in self._graph2.nodes:
+            degree = self._graph2.degree(artist)
+
+            weighted_degree = self._graph2.degree(artist,weight="weight")
+            results.append(
+                (artist,
+                 degree,
+                 weighted_degree,
+                 centrality[artist])
+            )
+        results.sort(key=lambda x: x[3],reverse=True)
+        return results[:3]
+    #vado ad inidividuare artisti maggiormente centarali all'interno del grafo:
+    # che raggiungono un ampio segmento della clientela
+
+    def analyze_customer_segments(self, outlier_threshold=1):
+        representative_customers = []
+        outlier_customers = []
+
+        for customer in self._graph3.nodes:
+            degree = self._graph3.degree(customer)
+            weighted_degree = self._graph3.degree(customer, weight="weight")
+
+            data = {
+                "customer": customer,
+                "degree": degree,
+                "weighted_degree": weighted_degree
+            }
+            if degree <= outlier_threshold:
+                outlier_customers.append(data)
+            else:
+                representative_customers.append(data)
+
+        representative_customers.sort(key=lambda x: x["weighted_degree"], reverse=True)
+        outlier_customers.sort(key=lambda x: x["degree"])
+        return representative_customers[:3], outlier_customers
+
 
 
 

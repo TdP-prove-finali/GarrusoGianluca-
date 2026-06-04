@@ -317,7 +317,7 @@ class DAO():
         cursor = cnx.cursor(dictionary=True)
 
         query = """select count(*) as num
-                        from Invoice i"""
+                        from Track t"""
         cursor.execute(query)
         row = cursor.fetchone()
 
@@ -407,6 +407,50 @@ class DAO():
             cursor.close()
             cnx.close()
         return top_artists[0:3]
+
+    @staticmethod
+    def get_name_genres():
+        cnx = DBConnect.get_connection()
+        genres = []
+        if cnx is None:
+            print("Connessione fallita")
+        cursor = cnx.cursor(dictionary=True)
+
+        query = """select g.Name as name
+                from Genre g """
+        cursor.execute(query)
+        for row in cursor:
+            genres.append(row['name'])
+
+        cursor.close()
+        cnx.close()
+        return genres
+
+
+    @staticmethod
+    def get_all_dates():
+        cnx = DBConnect.get_connection()
+        dates = []
+        if cnx is None:
+            print("Connessione fallita")
+        cursor = cnx.cursor(dictionary=True)
+
+        query = """select distinct i.InvoiceDate as date
+                from Invoice i 
+                order by i.InvoiceDate"""
+        cursor.execute(query)
+        for row in cursor:
+            dates.append(row['date'])
+
+        cursor.close()
+        cnx.close()
+        return dates
+
+
+
+
+
+
 
 
 
