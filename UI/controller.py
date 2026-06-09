@@ -1,77 +1,149 @@
+import flet as ft
+
+
 class Controller:
     def __init__(self, view, model):
-        # the view, with the graphical elements of the UI
+        # La view contiene gli elementi grafici dell'interfaccia
         self._view = view
-        # the model, which implements the logic of the program and holds the data
+        # Il model contiene la logica applicativa e i dati
         self._model = model
 
-    def load_insights(self):
-        """Carica gli insight iniziali dal model e aggiorna le card della dashboard."""
+    def fill_insights(self):
+        top_five_tracks = self._model.get_top_five_tracks()
+        top_five_artists = self._model.get_top_five_artists()
+        top_five_genres = self._model.get_top_five_genres()
 
-        # Riga 1: classifiche principali
-        top_brani = self._format_items(self._model.get_top_five_tracks())
-        top_artisti = self._format_items(self._model.get_top_five_artists())
-        top_generi = self._format_items(self._model.get_top_five_genres())
+        self._view._top_tracks_col.controls.clear()
+        self._view._top_artists_col.controls.clear()
+        self._view._top_genres_col.controls.clear()
 
-        self._view.aggiorna_lista(self._view._lista_top_brani, top_brani)
-        self._view.aggiorna_lista(self._view._lista_top_artisti, top_artisti)
-        self._view.aggiorna_lista(self._view._lista_top_generi, top_generi)
+        self._view._top_tracks_col.controls.append(
+            ft.Text("Top 5 Tracks", weight=ft.FontWeight.BOLD)
+        )
+        for track in top_five_tracks:
+            self._view._top_tracks_col.controls.append(
+                ft.Text(str(track))
+            )
 
-        # Riga 2: numeri generali
-        self._view.aggiorna_numero(self._view._txt_num_clienti, self._model.get_num_customers())
-        self._view.aggiorna_numero(self._view._txt_num_fatture, self._model.get_num_fatture())
-        self._view.aggiorna_numero(self._view._txt_num_tracce, self._model.get_num_tracks())
+        self._view._top_artists_col.controls.append(
+            ft.Text("Top 5 Artists", weight=ft.FontWeight.BOLD)
+        )
+        for artist in top_five_artists:
+            self._view._top_artists_col.controls.append(
+                ft.Text(str(artist))
+            )
 
-        # Riga 3: insight avanzati
-        top_clienti_spesa = self._format_items(self._model.get_top_3_spenders())
-        top_artisti_clienti = self._format_items(self._model.get_top_3_artist_with_more_different_clients())
+        self._view._top_genres_col.controls.append(
+            ft.Text("Top 5 Genres", weight=ft.FontWeight.BOLD)
+        )
+        for genre in top_five_genres:
+            self._view._top_genres_col.controls.append(
+                ft.Text(str(genre))
+            )
+        num_clienti = self._model.get_num_customers()
+        num_fatture = self._model.get_num_fatture()
+        num_tracce = self._model.get_num_tracks()
 
-        self._view.aggiorna_lista(self._view._lista_top_clienti_spesa, top_clienti_spesa)
-        self._view.aggiorna_lista(self._view._lista_top_artisti_clienti, top_artisti_clienti)
+        self._view._num_clienti.controls.clear()
+        self._view._num_fatture.controls.clear()
+        self._view._num_tracce.controls.clear()
 
-    def _format_items(self, items):
-        """
-        Converte in stringhe i risultati restituiti dal model.
+        self._view._num_clienti.controls.append(
+            ft.Text("Numero clienti", weight=ft.FontWeight.BOLD)
+        )
+        self._view._num_clienti.controls.append(
+            ft.Text(str(num_clienti))
+        )
 
-        Gestisce:
-        - oggetti dataclass, es. Track, Artist, Genre
-        - tuple, es. ('Mario', 'Rossi', 45.90)
-        - dizionari
-        - stringhe/numeri semplici
-        """
-        formatted = []
+        self._view._num_fatture.controls.append(
+            ft.Text("Numero fatture", weight=ft.FontWeight.BOLD)
+        )
+        self._view._num_fatture.controls.append(
+            ft.Text(str(num_fatture))
+        )
 
-        if items is None:
-            return formatted
+        self._view._num_tracce.controls.append(
+            ft.Text("Numero tracce", weight=ft.FontWeight.BOLD)
+        )
+        self._view._num_tracce.controls.append(
+            ft.Text(str(num_tracce))
+        )
+        top_3_artist_with_more_different_clients = self._model.get_top_3_artist_with_more_different_clients()
+        top_3_spenders = self._model.get_top_3_spenders()
 
-        for item in items:
-            formatted.append(self._format_single_item(item))
+        self._view._top_3_artist_with_more_different_client.controls.clear()
+        self._view._top_3_artist_with_more_different_client.controls.append(
+            ft.Text("Top 3 artisti con più clienti diversi:", weight=ft.FontWeight.BOLD)
+        )
+        for artist in top_3_artist_with_more_different_clients:
+            self._view._top_3_artist_with_more_different_client.controls.append(ft.Text(str(artist)))
+        self._view._top_3_spenders.controls.clear()
+        self._view._top_3_spenders.controls.append(
+            ft.Text("Top 3 clienti che hanno speso di più::", weight=ft.FontWeight.BOLD)
+        )
+        for client in top_3_spenders:
+            self._view._top_3_spenders.controls.append(ft.Text(f"{client[0]} {client[1]}"))
 
-        return formatted
+        self._view.update_page()
 
-    def _format_single_item(self, item):
-        """Formatta un singolo elemento in modo leggibile per la GUI."""
+    def handle_graph1(self, e):
+        self._view._lv_graph1.controls.clear()
 
-        # Caso dizionario
-        if isinstance(item, dict):
-            return " - ".join(str(v) for v in item.values())
+        data1 = self._view._data_graph1_1.value
+        data2 = self._view._data_graph1_2.value
+        genre = self._view._dd_genres.value
 
-        # Caso tuple/list, es. ('Mario', 'Rossi', 45.9)
-        if isinstance(item, (tuple, list)):
-            return " - ".join(str(v) for v in item)
+        if data1 is None or data2 is None or genre is None:
+            self._view._lv_graph1.controls.append(
+                ft.Text("Seleziona le date e un genere per proseguire.", color="red")
+            )
+            self._view.update_page()
+            return
 
-        # Caso oggetto con attributo Name, tipico di Track, Artist, Genre
-        if hasattr(item, "Name"):
-            return str(item.Name)
+        if data1 > data2:
+            self._view._lv_graph1.controls.append(
+                ft.Text("Seleziona un intervallo di date esistente.", color="red")
+            )
+            self._view.update_page()
+            return
 
-        # Alcune dataclass potrebbero avere name minuscolo
-        if hasattr(item, "name"):
-            return str(item.name)
+        self._view._lv_graph1.controls.append(
+            ft.Text(
+                f"Intervallo di date selezionato: {data1} - {data2}\n"
+                f"Genere selezionato: {genre}"
+            )
+        )
+        self._view.update_page()
 
-        # Cliente con nome e cognome
-        if hasattr(item, "FirstName") and hasattr(item, "LastName"):
-            return f"{item.FirstName} {item.LastName}"
+        self._model.buildGraph1(genre,data1, data2)
 
-        # Fallback: usa lo __str__ dell'oggetto
-        return str(item)
+        self._view._lv_graph1.controls.append(
+            ft.Text(
+                f"Grafo correttamente creato\n"
+                f"{self._model.printGraph1()}"
+            )
+        )
+        self._view.update_page()
+
+
+
+
+    def fill_ddGenres(self):
+        genres = self._model.get_name_genres()
+
+        self._view._dd_genres.options.clear()
+
+        for genre in genres:
+            self._view._dd_genres.options.append(
+                ft.dropdown.Option(genre)
+            )
+
+
+
+
+
+
+
+
+
 

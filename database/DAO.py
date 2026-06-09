@@ -1,5 +1,6 @@
 from database.DB_connect import DBConnect
 from model.Artist import Artist
+from model.Customer import Customer
 from model.Genre import Genre
 from model.Track import Track
 
@@ -156,7 +157,7 @@ class DAO():
                     from Customer c"""
             cursor.execute(query)
             for row in cursor:
-                nodes.append(Artist(**row))
+                nodes.append(Customer(**row))
             cursor.close()
             cnx.close()
         return nodes
@@ -183,7 +184,7 @@ class DAO():
                 and c1.CustomerId < c2.CustomerId
                 group by c1.CustomerId, c2.CustomerId
                 having count(distinct t1.TrackId) >= %s"""
-            cursor.execute(query,(soglia))
+            cursor.execute(query,(soglia,))
             for row in cursor:
                 edges.append((idMap[row['n1']], idMap[row['n2']], row['peso']))
             cursor.close()
