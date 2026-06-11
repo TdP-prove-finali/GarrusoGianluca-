@@ -60,6 +60,7 @@ class Model:
         self._idMapNodes_3 = {}
         for node in self._nodes_3:
             self._idMapNodes_3[node.CustomerId] = node
+        self._graph3.add_nodes_from(self._nodes_3)
         self._edges_3 = DAO.get_edges_3(soglia,self._idMapNodes_3)
         for edge in self._edges_3:
             self._graph3.add_edge(edge[0], edge[1], weight=edge[2])
@@ -99,7 +100,13 @@ class Model:
         return score
 
 
+
+
+
+
     def get_optPath_Artisti(self,k_artisti,alfa):
+        if k_artisti > len(self._nodes_2):
+            return [], 0
         self._best_artists = []
         self._best_score2  = float('-inf')
         res_query = DAO.get_artista_clienti()
@@ -173,8 +180,9 @@ class Model:
                 self._best_clients = copy.deepcopy(parziale)
                 self._best_score_clients = score
             return
-        for i in range(start,len(self._nodes_3)):
-            node = self._nodes_3[i]
+        nodes = list(self._graph3.nodes)
+        for i in range(start,len(nodes)):
+            node = nodes[i]
             if node not in parziale:
                 parziale.append(node)
                 self._ricorsione_clienti(k_clienti,parziale,alfa,i+1)
@@ -300,6 +308,9 @@ class Model:
     #vado ad inidividuare artisti maggiormente centarali all'interno del grafo:
     # che raggiungono un ampio segmento della clientela
 
+    def get_nodes_graph1(self):
+        return list(self._graph1.nodes)
+
     def analyze_customer_segments(self, outlier_threshold=1):
         representative_customers = []
         outlier_customers = []
@@ -321,6 +332,7 @@ class Model:
         representative_customers.sort(key=lambda x: x["weighted_degree"], reverse=True)
         outlier_customers.sort(key=lambda x: x["degree"])
         return representative_customers[:3], outlier_customers
+
 
 
 
