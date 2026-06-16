@@ -116,15 +116,6 @@ class Model:
 
         return self._best_artists, self._best_score2
 
-    def calcola_clienti_per_artista(self,res_query):
-        self._artista_cliente = {}
-        for item in res_query:
-            if item[0] not in self._artista_cliente:
-                self._artista_cliente[item[0]] = set()
-            self._artista_cliente[item[0]].add(item[1])
-        return self._artista_cliente
-
-
     def ricorsione_artisti(self,k_artisti,parziale,alfa,start):
         if len(parziale) == k_artisti:
             score = self.calcolaScore2(parziale,alfa)
@@ -138,6 +129,14 @@ class Model:
                 parziale.append(node)
                 self.ricorsione_artisti(k_artisti, parziale, alfa,i+1)
                 parziale.pop()
+
+    def calcola_clienti_per_artista(self,res_query):
+        self._artista_cliente = {}
+        for item in res_query:
+            if item[0] not in self._artista_cliente:
+                self._artista_cliente[item[0]] = set()
+            self._artista_cliente[item[0]].add(item[1])
+        return self._artista_cliente
 
 
 
