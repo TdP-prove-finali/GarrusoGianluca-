@@ -20,7 +20,7 @@ class Model:
         self._graph1 = nx.Graph()
         self._graph2 = nx.Graph()
         self._graph3 = nx.Graph()
-        #self._idMap_copertura_artisti_clienti = DAO.get_copertura_artisti_clienti()
+
 
 
     def buildGraph1(self, genre, date1, date2):
@@ -263,9 +263,6 @@ class Model:
     #return lista di stringhe con i nomi die generi
 
 
-    def get_all_dates(self):
-        return DAO.get_all_dates()
-    #return elenco di date ordinate del tipo <class 'datetime.datetime'>
 
     def get_top_bridge_tracks(self):
         centrality = nx.betweenness_centrality(self._graph1, weight="weight")

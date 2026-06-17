@@ -428,24 +428,7 @@ class DAO():
         return genres
 
 
-    @staticmethod
-    def get_all_dates():
-        cnx = DBConnect.get_connection()
-        dates = []
-        if cnx is None:
-            print("Connessione fallita")
-        cursor = cnx.cursor(dictionary=True)
 
-        query = """select distinct i.InvoiceDate as date
-                from Invoice i 
-                order by i.InvoiceDate"""
-        cursor.execute(query)
-        for row in cursor:
-            dates.append(row['date'])
-
-        cursor.close()
-        cnx.close()
-        return dates
 
 
 
