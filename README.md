@@ -1,6 +1,6 @@
 # Tesi Tecniche di Programmazione
 
-## Applicazione per l'analisi e l'ottimizzazione di reti musicali tramite grafi
+## Applicazione di analisi e ottimizzazione dei dati di vendita musicali
 
 ### Istruzioni per l'installazione e l'utilizzo dell'applicazione:
 
